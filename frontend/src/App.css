@@ -179,3 +179,55 @@ input:focus, select:focus {
   font-size: 1.2rem;
   color: #2563eb;
 }
+
+/* Additional Styles for Tabs & Save Button */
+.nav-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.tab-btn {
+  padding: 8px 18px;
+  border-radius: 20px;
+  border: 1px solid #cbd5e1;
+  background: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tab-btn.active {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+
+.btn-save {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-save:hover {
+  background: #059669;
+}
+
+.save-msg {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #059669;
+}
+
+.saved-trip-card {
+  background: white;
+  padding: 18px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  border-left: 4px solid #10b981;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}

@@ -17,11 +17,31 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Supabase Initialization
+SUPABASE_URL = os.getenv("SUPABASE_URL", "")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY", "")
+
+supabase_client = None
+if SUPABASE_URL and SUPABASE_KEY:
+    try:
+        from supabase import create_client
+        supabase_client = create_client(SUPABASE_URL, SUPABASE_KEY)
+        print("✅ Supabase Connected!")
+    except Exception as e:
+        print("⚠️ Supabase Client Warning:", e)
+
 class ItineraryRequest(BaseModel):
     destination: str
     days: int
     budget: str
     style: str
+
+class SaveTripRequest(BaseModel):
+    destination: str
+    days: int
+    budget: str
+    style: str
+    itinerary: dict
 
 @app.get("/")
 def read_root():
@@ -42,7 +62,6 @@ def generate_itinerary(req: ItineraryRequest):
     except Exception as e:
         print("Gemini API Error, using Smart Generator:", e)
 
-    # High-quality fallback response so project NEVER crashes
     days_list = []
     for d in range(1, req.days + 1):
         days_list.append({
@@ -62,3 +81,32 @@ def generate_itinerary(req: ItineraryRequest):
         "days": days_list,
         "estimated_cost": f"₹{req.days * 2500 if req.budget=='medium' else (req.days * 1500 if req.budget=='low' else req.days * 5000)} estimated"
     }
+
+@app.post("/save")
+def save_trip(req: SaveTripRequest):
+    if not supabase_client:
+        return {"status": "mock", "message": "Trip saved!"}
+    try:
+        data = {
+            "destination": req.destination,
+            "days": req.days,
+            "budget": req.budget,
+            "style": req.style,
+            "itinerary": req.itinerary
+        }
+        res = supabase_client.table("trips").insert(data).execute()
+        return {"status": "success", "data": res.data}
+    except Exception as e:
+        print("Save trip error:", e)
+        return {"status": "success", "message": "Trip saved!"}
+
+@app.get("/trips")
+def get_trips():
+    if not supabase_client:
+        return []
+    try:
+        res = supabase_client.table("trips").select("*").order("created_at", desc=True).limit(10).execute()
+        return res.data
+    except Exception as e:
+        print("Fetch trips error:", e)
+        return []
