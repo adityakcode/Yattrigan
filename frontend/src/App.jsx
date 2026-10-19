@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 
+const API_BASE_URL = 'https://yattrigan.onrender.com'
+
 function App() {
   const [formData, setFormData] = useState({
     destination: 'Jaipur',
@@ -13,15 +15,13 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   
-  // Save & View Saved Trips state
   const [savedTrips, setSavedTrips] = useState([])
   const [saveStatus, setSaveStatus] = useState('')
-  const [activeTab, setActiveTab] = useState('planner') // 'planner' or 'saved'
+  const [activeTab, setActiveTab] = useState('planner')
 
-  // Fetch saved trips from backend
   const fetchSavedTrips = async () => {
     try {
-      const res = await fetch('http://localhost:8000/trips')
+      const res = await fetch(`${API_BASE_URL}/trips`)
       if (res.ok) {
         const data = await res.json()
         setSavedTrips(data)
@@ -47,7 +47,7 @@ function App() {
     setSaveStatus('')
 
     try {
-      const response = await fetch('http://localhost:8000/generate', {
+      const response = await fetch(`${API_BASE_URL}/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -76,7 +76,7 @@ function App() {
     setSaveStatus('Saving...')
 
     try {
-      const response = await fetch('http://localhost:8000/save', {
+      const response = await fetch(`${API_BASE_URL}/save`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
