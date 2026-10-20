@@ -112,14 +112,14 @@ class ItineraryDay(StrictModel):
     food: str = Field(min_length=1, max_length=1500)
     stay: str = Field(min_length=1, max_length=1000)
     transport: str = Field(min_length=1, max_length=1000)
-    day_cost: str = Field(min_length=1, max_length=200)
+    day_cost: str = Field(min_length=1, max_length=600)
 
 
 class ItineraryResponse(StrictModel):
     destination: str = Field(min_length=1, max_length=120)
     summary: str = Field(min_length=1, max_length=1000)
     days: list[ItineraryDay] = Field(min_length=1, max_length=30)
-    estimated_cost: str = Field(min_length=1, max_length=200)
+    estimated_cost: str = Field(min_length=1, max_length=800)
 
 
 class SaveTripRequest(ItineraryRequest):
@@ -317,8 +317,15 @@ def health_check():
     status_code=status.HTTP_200_OK,
 )
 def generate_itinerary(req: ItineraryRequest):
-    return generate_with_groq(req)
-
+    last_error = None
+    for _ in range(3):
+        try:
+            return generate_with_groq(req)
+        except HTTPException as e:
+            last_error = e
+            if e.status_code != 502:
+                raise
+    raise last_error
 
 @app.post("/save", status_code=status.HTTP_201_CREATED)
 def save_trip(req: SaveTripRequest):
