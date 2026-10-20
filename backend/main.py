@@ -93,6 +93,7 @@ class ItineraryRequest(StrictModel):
     days: int = Field(ge=1, le=30)
     budget: str = Field(min_length=2, max_length=100)
     style: str = Field(min_length=2, max_length=100)
+    notes: str = Field(default="", max_length=800)
 
     @field_validator("destination", "budget", "style")
     @classmethod
